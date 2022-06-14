@@ -30,7 +30,7 @@ format_dict = {
     }
 
 # todo:
-# implement more formats (DIBV5, JPEG, PNG) in get_DIB
+# implement more formats (JPEG, PNG) in get_DIB
 # implement transparency in set_DIB
 
 user32 = ctypes.windll.user32
@@ -102,7 +102,7 @@ class BITMAPV4HEADER(ctypes.Structure):
         ('bV4GreenMask', DWORD),
         ('bV4BlueMask', DWORD),
         ('bV4AlphaMask', DWORD),
-        ('bV4CSMask', DWORD),
+        ('bV4CSTypes', DWORD),
         ('bV4RedEndpointX', LONG),
         ('bV4RedEndpointY', LONG),
         ('bV4RedEndpointZ', LONG),
@@ -118,29 +118,44 @@ class BITMAPV4HEADER(ctypes.Structure):
     ]
 sizeof_BITMAPV4HEADER = ctypes.sizeof(BITMAPV4HEADER)
 
-def BITMAPINFO_to_BITMAPV4(bmp_info):
-    """
-    converts bitmap with older BITMAPINFOHEADER to BITMAPV4HEADER (which truly supports an alpha channel).
+class BITMAPV5HEADER(ctypes.Structure):
+    _pack_ = 1 # structure field byte alignment
+    _fields_ = [
+        ('bV5Size', DWORD),
+        ('bV5Width', LONG),
+        ('bV5Height', LONG),
+        ('bV5PLanes', WORD),
+        ('bV5BitCount', WORD),
+        ('bV5Compression', DWORD),
+        ('bV5SizeImage', DWORD),
+        ('bV5XPelsPerMeter', LONG),
+        ('bV5YPelsPerMeter', LONG),
+        ('bV5ClrUsed', DWORD),
+        ('bV5ClrImportant', DWORD),
+        ('bV5RedMask', DWORD),
+        ('bV5GreenMask', DWORD),
+        ('bV5BlueMask', DWORD),
+        ('bV5AlphaMask', DWORD),
+        ('bV5CSTypes', DWORD),
+        ('bV5RedEndpointX', LONG),
+        ('bV5RedEndpointY', LONG),
+        ('bV5RedEndpointZ', LONG),
+        ('bV5GreenEndpointX', LONG),
+        ('bV5GreenEndpointY', LONG),
+        ('bV5GreenEndpointZ', LONG),
+        ('bV5BlueEndpointX', LONG),
+        ('bV5BlueEndpointY', LONG),
+        ('bV5BlueEndpointZ', LONG),
+        ('bV5GammaRed', DWORD),
+        ('bV5GammaGreen', DWORD),
+        ('bV5GammaBlue', DWORD),
+        ('bV5Intent', DWORD),
+        ('bV5ProfileData', DWORD),
+        ('bV5ProfileSize', DWORD),
+        ('bV5Reserved', DWORD)
+    ]
+sizeof_BITMAPV5HEADER = ctypes.sizeof(BITMAPV5HEADER)
 
-    :param bytes bmp_info: source bitmap data. Must be of BITMAPINFOHEADER format starting from the header structure.
-    """
-
-    # BITMAPINFOHEADER _technically_ does not support an alpha channel, but has an 'extra' channel which some softwares treat as alpha.
-    # So we need to convert a BITMAPINFOHEADER to BITMAPV4HEADER (which does support alpha) for other softwares to recognize the alpha channel
-    # This function fills in the extra header space with default values.
-    # info on these header structures -> https://docs.microsoft.com/en-us/windows/win32/gdi/bitmap-header-types
-    # and -> https://en.wikipedia.org/wiki/BMP_file_format
-
-    if (bmp_info[0] != 40):
-        raise ValueError('source bitmap is not in the expected format')
-        return 0
-
-    bi_size = bytes([108, 0, 0, 0])
-    bi_bitmasks = bytes([0, 0, 255, 0, 0, 255, 0, 0, 255, 0, 0, 0, 0, 0, 0, 255])
-    bi_extra = bytearray(52)
-
-    bmp_v4 = bi_size + bmp_info[4:40] + bi_bitmasks + bi_extra + bmp_info[40:]
-    return bmp_v4
 
 def get_UNICODETEXT():
     """
@@ -177,43 +192,74 @@ def set_UNICODETEXT(text):
     user32.SetClipboardData(CF_UNICODETEXT, h_mem)
     user32.CloseClipboard()
 
-def get_DIB(filepath = 'bitmap.bmp', as_bmpV4 = False):
+def get_DIB(filepath = 'bitmap.bmp'):
     """
     get image from clipboard as a bitmap 
 
     :param str filepath: filepath (path/bitmap.bmp) to save image into 
-    :param bool as_bmpV4: whether to pull image as a bitmapV4 (with supported alpha channel)
     """
 
     user32.OpenClipboard(0)
-
     h_mem = user32.GetClipboardData(CF_DIB)
     dest = kernel32.GlobalLock(h_mem)
     size = kernel32.GlobalSize(dest)
-    print('size ', size)
-    
     data = bytes((ctypes.c_char*size).from_address(dest))
 
-    if data[0] == 40:
-        if as_bmpV4:
-            bm_ih = BITMAPV4HEADER()
-            header_size = sizeof_BITMAPV4HEADER
-            data = BITMAPINFO_to_BITMAPV4(data)
-            ctypes.memmove(ctypes.pointer(bm_ih), data, header_size)
+    bm_ih = BITMAPINFOHEADER()
+    header_size = sizeof_BITMAPINFOHEADER
+    ctypes.memmove(ctypes.pointer(bm_ih), data, header_size)
 
-            if bm_ih.bV4Compression != BI_BITFIELDS: 
-                print(f'unsupported compression type {format(bm_ih.biCompression)}')
-                return 0
-        else:
-            bm_ih = BITMAPINFOHEADER()
-            header_size = sizeof_BITMAPINFOHEADER
-            ctypes.memmove(ctypes.pointer(bm_ih), data, header_size)
+    if bm_ih.biCompression != BI_BITFIELDS: 
+        print(f'unsupported compression type {format(bm_ih.biCompression)}')
+        return 0         
 
-            if bm_ih.biCompression != BI_BITFIELDS: 
-                print(f'unsupported compression type {format(bm_ih.biCompression)}')
-                return 0         
+    bm_fh = BITMAPFILEHEADER()
+    ctypes.memset(ctypes.pointer(bm_fh), 0, sizeof_BITMAPFILEHEADER)
+    bm_fh.bfType = ord('B') | (ord('M') << 8)
+    bm_fh.bfSize = sizeof_BITMAPFILEHEADER + len(str(data))
+    sizeof_COLORTABLE = 0
+    bm_fh.bfOffBits = sizeof_BITMAPFILEHEADER + header_size + sizeof_COLORTABLE
+
+    with open(filepath, 'wb') as bmp_file:
+        bmp_file.write(bm_fh)
+        bmp_file.write(data)
+
+    kernel32.GlobalUnlock(h_mem)
+    user32.CloseClipboard()
+
+def get_DIBV5(filepath = 'bitmapV5.bmp'):
+    """
+    get image from clipboard as a bitmapV5
+
+    :param str filepath: filepath (path/bitmap.bmp) to save image into 
+    """
+
+    user32.OpenClipboard(0)
+    h_mem = user32.GetClipboardData(CF_DIBV5)
+    dest = kernel32.GlobalLock(h_mem)
+    size = kernel32.GlobalSize(dest)
+    data = bytes((ctypes.c_char*size).from_address(dest))
+
+    bm_ih = BITMAPV5HEADER()
+    header_size = sizeof_BITMAPV5HEADER
+    ctypes.memmove(ctypes.pointer(bm_ih), data, header_size)
+
+    if bm_ih.bV5Compression == BI_RGB:
+        # convert BI_RGB to BI_BITFIELDS so as to properly support an alpha channel
+        # everything other than the usage of bitmasks is same compared to BI_BITFIELDS so we manually add that part and put bV5Compression to BI_BITFIELDS
+        # info on these header structures -> https://docs.microsoft.com/en-us/windows/win32/gdi/bitmap-header-types
+        # and -> https://en.wikipedia.org/wiki/BMP_file_format
+
+        bi_compression = bytes([3, 0, 0, 0])
+        bi_bitmasks = bytes([0, 0, 255, 0,  0, 255, 0, 0,  255, 0, 0, 0,  0, 0, 0, 255])
+        data = data[:16] + bi_compression + data[20:40] + bi_bitmasks + data[56:]
+
+    elif bm_ih.bV5Compression == BI_BITFIELDS:
+        # we still need to add bitmask (bV5AlphaMask) for softwares to recognize the alpha channel
+        data = data[:52] + bytes([0, 0, 0, 255]) + data[56:]
+
     else:
-        print('unsupported image format on clipboard')
+        print(f'unsupported compression type {format(bm_ih.bV5Compression)}')
         return 0
 
     bm_fh = BITMAPFILEHEADER()
@@ -270,8 +316,9 @@ def is_format_available(format_id):
 #         print('format available: ', format)
 
 if __name__ == '__main__':
-    set_UNICODETEXT('pasta pasta')
-    # get_DIB(as_bmpV4=True)
+    set_UNICODETEXT('pasta pasta pasta')
+    # get_DIB())
+    # get_DIBV5()
 
     # with open('test_bmp4.bmp', 'rb') as img:
     #     d = img.read()
