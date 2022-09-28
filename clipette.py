@@ -4,9 +4,13 @@
 import ctypes
 from ctypes.wintypes import *
 from os.path import join as path_join
+from sys import getfilesystemencoding
 
 GMEM_MOVABLE = 2
+INT_P = ctypes.POINTER(ctypes.c_int)
+
 CF_UNICODETEXT = 13
+CF_HDROP = 15
 CF_BITMAP = 2   # hbitmap
 CF_DIB = 8   # DIB and BITMAP are interconvertable as from windows clipboard
 CF_DIBV5 = 17
@@ -46,6 +50,7 @@ format_dict = {
 
 user32 = ctypes.windll.user32
 kernel32 = ctypes.windll.kernel32
+shell32 = ctypes.windll.shell32
 
 user32.OpenClipboard.argtypes = HWND,
 user32.OpenClipboard.restype = BOOL
@@ -72,10 +77,15 @@ user32.RegisterClipboardFormatW.restype = UINT
 user32.EmptyClipboard.argtypes = None
 user32.EmptyClipboard.restype = BOOL
 
+kernel32.GlobalAlloc.argtypes = UINT, ctypes.c_size_t
+kernel32.GlobalAlloc.restype = HGLOBAL
 kernel32.GlobalLock.argtypes = HGLOBAL, 
-kernel32.GlobalLock.restypes = LPCVOID
+kernel32.GlobalLock.restype = LPVOID
 kernel32.GlobalUnlock.argtypes = HGLOBAL,
 kernel32.GlobalUnlock.restype = BOOL
+
+shell32.DragQueryFile.argtypes = HANDLE, UINT, ctypes.c_void_p, UINT
+shell32.DragQueryFile.restype = UINT
 
 
 class BITMAPFILEHEADER(ctypes.Structure):
@@ -178,7 +188,30 @@ class BITMAPV5HEADER(ctypes.Structure):
     ]
 sizeof_BITMAPV5HEADER = ctypes.sizeof(BITMAPV5HEADER)
 
+def open_clipboard():
+    """
+    Opens clipboard. Must be called before any action in performed.
 
+    :return: (int) 0 if function fails, otherwise 1
+    """
+    return user32.OpenClipboard(0)
+
+def close_clipboard():
+    """
+    Closes clipboard. Must be called after all actions are performed.
+
+    :return: (int) 0 if function fails, otherwise 1
+    """
+    return user32.CloseClipboard()
+
+def empty_cliboard():
+    """
+    Empties clipboard. Should be called before any setter actions.
+
+    :return: (int) 0 if function fails, otherwise 1
+    """
+    return user32.EmptyClipboard()
+    
 def get_UNICODETEXT():
     """
     get text from clipboard as string 
@@ -200,6 +233,7 @@ def set_UNICODETEXT(text):
     set text to clipboard as CF_UNICODETEXT 
 
     :param str text: text to set to clipboard
+    :return: 1 if function succeeds, something else othewise (or maybe just spit out an error)
     """
 
     data = text.encode('utf-16le')
@@ -211,17 +245,37 @@ def set_UNICODETEXT(text):
     kernel32.GlobalUnlock(h_mem)
 
     # user32.OpenClipboard(0)
-    user32.EmptyClipboard()
+    # user32.EmptyClipboard()
     user32.SetClipboardData(CF_UNICODETEXT, h_mem)
     # user32.CloseClipboard()
     return 1
 
+def get_FILEPATHS():
+    """
+    get list of files from clipboard. 
+
+    :return: (list) filepaths
+    """
+    filepaths = []
+
+    #user32.OpenClipboard(0)
+    data = user32.GetClipboardData(CF_HDROP)
+    file_count = shell32.DragQueryFile(data, -1, None, 0)
+    for index in range(file_count):
+        buf = ctypes.c_buffer(260)
+        shell32.DragQueryFile(data, index, buf, ctypes.sizeof(buf))
+        filepaths.append(buf.value.decode(getfilesystemencoding()))
+    #user32.CloseClipboard()
+
+    return filepaths
+
 def get_DIB(filepath = '', filename = 'bitmap'):
     """
-    get image from clipboard as a bitmap 
+    get image from clipboard as a bitmap and saves to filepath.
 
     :param str filepath: filepath to save image into 
     :param str filename: filename of the image
+    :return: 1 if function succeeds, something else othewise (or maybe just spit out an error)
     """
 
     # user32.OpenClipboard(0)
@@ -237,9 +291,9 @@ def get_DIB(filepath = '', filename = 'bitmap'):
     header_size = sizeof_BITMAPINFOHEADER
     ctypes.memmove(ctypes.pointer(bm_ih), data, header_size)
 
-    if bm_ih.biCompression not in (BI_BITFIELDS, BI_RGB): 
-        print(f'unsupported compression type {format(bm_ih.biCompression)}')
-        return 0         
+    compression = bm_ih.biCompression
+    if compression not in (BI_BITFIELDS, BI_RGB): 
+        raise RuntimeError(f'unsupported compression type {format(compression)}')
 
     bm_fh = BITMAPFILEHEADER()
     ctypes.memset(ctypes.pointer(bm_fh), 0, sizeof_BITMAPFILEHEADER)
@@ -259,10 +313,11 @@ def get_DIB(filepath = '', filename = 'bitmap'):
 
 def get_DIBV5(filepath = '', filename = 'bitmapV5'):
     """
-    get image from clipboard as a bitmapV5
+    get image from clipboard as a bitmapV5 and saves to filepath
 
     :param str filepath: filepath to save image into 
     :param str filename: filename of the image
+    :return: 1 if function succeeds, something else othewise (or maybe just spit out an error)
     """
 
     # user32.OpenClipboard(0)
@@ -293,8 +348,7 @@ def get_DIBV5(filepath = '', filename = 'bitmapV5'):
         data = data[:52] + bytes([0, 0, 0, 255]) + data[56:]
 
     else:
-        print(f'unsupported compression type {format(bm_ih.bV5Compression)}')
-        return 0
+        raise RuntimeError(f'unsupported compression type {format(bm_ih.bV5Compression)}')
 
     bm_fh = BITMAPFILEHEADER()
     ctypes.memset(ctypes.pointer(bm_fh), 0, sizeof_BITMAPFILEHEADER)
@@ -314,19 +368,25 @@ def get_DIBV5(filepath = '', filename = 'bitmapV5'):
 
 def get_PNG(filepath = '', filename = 'PNG'):
     """
-    get image in 'PNG' format from clipboard
+    get image in 'PNG' or 'image/png' format from clipboard and saves to filepath
 
     :param str filepath: filepath to save image into
     :param str filename: filename of the image
-
+    :return: 1 if function succeeds, something else othewise (or maybe just spit out an error)
     """
 
     # user32.OpenClipboard(0)
+    png_format = 0
     PNG = user32.RegisterClipboardFormatW(ctypes.c_wchar_p('PNG'))
-    if not user32.IsClipboardFormatAvailable(PNG):
-        raise RuntimeError("clipboard image not available in 'PNG' format")
+    image_png = user32.RegisterClipboardFormatW(ctypes.c_wchar_p('image/png'))
+    if user32.IsClipboardFormatAvailable(PNG):
+        png_format = PNG
+    elif user32.IsClipboardFormatAvailable(image_png):
+        png_format = image_png
+    else:
+        raise RuntimeError("clipboard image not available in 'PNG'or 'image/png' format")
 
-    h_mem = user32.GetClipboardData(PNG)
+    h_mem = user32.GetClipboardData(png_format)
     dest = kernel32.GlobalLock(h_mem)
     size = kernel32.GlobalSize(dest)
     data = bytes((ctypes.c_char*size).from_address(dest))
@@ -341,28 +401,32 @@ def get_PNG(filepath = '', filename = 'PNG'):
 
 def set_DIB(src_bmp):
     """
-    set source bitmap image to clipboard as a CF_DIB *or* CF_DIBV5 according to the image
+    set source bitmap image to clipboard as a CF_DIB or CF_DIBV5 according to the image
 
     :param str src_bmp: filepath of source image
+    :return: 1 if function succeeds, something else othewise (or maybe just spit out an error)
     """
 
     with open(src_bmp, 'rb') as img:
         data = img.read()
     output = data[14:]
     size = len(output) 
+    print(list(bytearray(output)[:200]))
 
     mem = kernel32.GlobalAlloc(GMEM_MOVABLE, size)
     h_mem = kernel32.GlobalLock(mem)
-    ctypes.memmove(h_mem, output, size) 
+    ctypes.memmove(ctypes.cast(h_mem, INT_P), ctypes.cast(output, INT_P), size) 
     kernel32.GlobalUnlock(mem)
 
-    # user32.OpenClipboard(0)
+    
     if output[0] in [56, 108, 124]:
         # img contains DIBV5 or DIBV4 or DIBV3 Header
         fmt = CF_DIBV5
     else:
         fmt = CF_DIB
-    user32.EmptyClipboard()
+
+    # user32.OpenClipboard(0)
+    # user32.EmptyClipboard()
     user32.SetClipboardData(fmt, h_mem)
     # user32.CloseClipboard()
     return 1  
@@ -372,6 +436,7 @@ def set_PNG(src_png):
     set source png image to clipboard in 'PNG' format
 
     :param str src_png: filepath of source image
+    :return: 1 if function succeeds, something else othewise (or maybe just spit out an error)
     """
     with open(src_png, 'rb') as img:
         data = img.read()
@@ -383,7 +448,7 @@ def set_PNG(src_png):
     kernel32.GlobalUnlock(mem)
 
     # user32.OpenClipboard(0)
-    user32.EmptyClipboard()
+    # user32.EmptyClipboard()
     PNG = user32.RegisterClipboardFormatW(ctypes.c_wchar_p('PNG'))
     user32.SetClipboardData(PNG, h_mem)
     # user32.CloseClipboard()
@@ -434,8 +499,9 @@ def get_image(filepath = '', filename = 'image'):
     """
     # user32.OpenClipboard(0)
     PNG = user32.RegisterClipboardFormatW(ctypes.c_wchar_p('PNG'))
+    image_png = user32.RegisterClipboardFormatW(ctypes.c_wchar_p('image/png'))
     
-    if user32.IsClipboardFormatAvailable(PNG):
+    if user32.IsClipboardFormatAvailable(PNG) or user32.IsClipboardFormatAvailable(image_png):
         get_PNG(filepath, filename)
         return 1
     elif user32.IsClipboardFormatAvailable(CF_DIBV5):
@@ -450,32 +516,29 @@ def get_image(filepath = '', filename = 'image'):
 
 def set_image(src_img):
     """
-    set source image to clipboard in multiple formats (PNG, DIB)
+    (NOT FULLY IMPLEMENTED) set source image to clipboard in multiple formats (PNG, DIB).
 
     :param str src_img: filepath of source image
+    :return: 1 if function succeeds, something else othewise (or maybe just spit out an error)
     """
     # this is more complicated... gotta interconvert images
-    # looking into ways to get this done with ctypes as well
-    return 0
+    # looking into ways to get this done with ctypes as well - NO IM DONE
+
+    # temporary solution
+    img_extn = src_img[(len(src_img)-3):].lower()
+    if img_extn == 'bmp':
+        # image format is bitmap
+        set_DIB(src_img)
+    elif img_extn == 'png':
+        # image format is png
+        set_PNG(src_img)
+    else:
+        raise RuntimeError('Unsupported image format')
+
+    return 1
 
 if __name__ == '__main__':
-    user32.OpenClipboard(0)
-    set_UNICODETEXT('pasta pasta pasta pasta pasta')
-    user32.CloseClipboard()
-
-    ### testing stuff ###
-
-    # with open('test_bmp4.bmp', 'rb') as img:
-    #     d = img.read()
-    # print(list(d[14:]))
-    # print(len(d))
-
-    # print(get_available_formats())
-    
-    # user32.OpenClipboard(0)
-    # h_mem = user32.GetClipboardData(49853)
-    # dest = kernel32.GlobalLock(h_mem)
-    # size = kernel32.GlobalSize(dest)
-    # data = bytes((ctypes.c_char*size).from_address(dest))
-    # print(list(data[:300]))
-    # user32.CloseClipboard()
+    if open_clipboard():
+        empty_cliboard()
+        set_UNICODETEXT('pasta pasta pasta pasta pasta pasta')
+        close_clipboard()
