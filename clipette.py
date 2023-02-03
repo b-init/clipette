@@ -539,6 +539,7 @@ def set_image(src_img):
 
 if __name__ == '__main__':
     if open_clipboard():
-        empty_cliboard()
-        set_UNICODETEXT('pasta pasta pasta pasta pasta pasta')
+        print(get_available_formats())
+        # empty_cliboard()
+        # set_UNICODETEXT('pasta pasta pasta pasta pasta pasta')
         close_clipboard()
