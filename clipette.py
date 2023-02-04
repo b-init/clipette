@@ -79,6 +79,8 @@ user32.EmptyClipboard.restype = BOOL
 
 kernel32.GlobalAlloc.argtypes = UINT, ctypes.c_size_t
 kernel32.GlobalAlloc.restype = HGLOBAL
+kernel32.GlobalSize.argtypes = HGLOBAL,
+kernel32.GlobalSize.restype = UINT
 kernel32.GlobalLock.argtypes = HGLOBAL, 
 kernel32.GlobalLock.restype = LPVOID
 kernel32.GlobalUnlock.argtypes = HGLOBAL,
@@ -280,7 +282,7 @@ def get_DIB(filepath = '', filename = 'bitmap'):
 
     # user32.OpenClipboard(0)
     if not user32.IsClipboardFormatAvailable(CF_DIB):
-        raise RuntimeError("clipboard image not available in 'CF_DIB' format")
+        raise_runtimerror("clipboard image not available in 'CF_DIB format")
 
     h_mem = user32.GetClipboardData(CF_DIB)
     dest = kernel32.GlobalLock(h_mem)
@@ -293,7 +295,7 @@ def get_DIB(filepath = '', filename = 'bitmap'):
 
     compression = bm_ih.biCompression
     if compression not in (BI_BITFIELDS, BI_RGB): 
-        raise RuntimeError(f'unsupported compression type {format(compression)}')
+        raise_runtimerror(f'unsupported compression type {format(compression)}')
 
     bm_fh = BITMAPFILEHEADER()
     ctypes.memset(ctypes.pointer(bm_fh), 0, sizeof_BITMAPFILEHEADER)
@@ -322,7 +324,7 @@ def get_DIBV5(filepath = '', filename = 'bitmapV5'):
 
     # user32.OpenClipboard(0)
     if not user32.IsClipboardFormatAvailable(CF_DIBV5):
-        raise RuntimeError("clipboard image not available in 'CF_DIBV5' format")
+        raise_runtimerror("clipboard image not available in 'CF_DIBV5' format")
 
     h_mem = user32.GetClipboardData(CF_DIBV5)
     dest = kernel32.GlobalLock(h_mem)
@@ -348,7 +350,7 @@ def get_DIBV5(filepath = '', filename = 'bitmapV5'):
         data = data[:52] + bytes([0, 0, 0, 255]) + data[56:]
 
     else:
-        raise RuntimeError(f'unsupported compression type {format(bm_ih.bV5Compression)}')
+        raise_runtimerror(f'unsupported compression type {format(bm_ih.bV5Compression)}')
 
     bm_fh = BITMAPFILEHEADER()
     ctypes.memset(ctypes.pointer(bm_fh), 0, sizeof_BITMAPFILEHEADER)
@@ -384,7 +386,7 @@ def get_PNG(filepath = '', filename = 'PNG'):
     elif user32.IsClipboardFormatAvailable(image_png):
         png_format = image_png
     else:
-        raise RuntimeError("clipboard image not available in 'PNG'or 'image/png' format")
+        raise_runtimerror("clipboard image not available in 'PNG' or 'image/png' format")
 
     h_mem = user32.GetClipboardData(png_format)
     dest = kernel32.GlobalLock(h_mem)
@@ -511,8 +513,7 @@ def get_image(filepath = '', filename = 'image'):
         get_DIB(filepath, filename)
         return 1
     else:
-        raise RuntimeError('image on clipboard not available in any supported format')
-        return 0
+        raise_runtimerror('image on clipboard not available in any supported format')
 
 def set_image(src_img):
     """
@@ -533,12 +534,17 @@ def set_image(src_img):
         # image format is png
         set_PNG(src_img)
     else:
-        raise RuntimeError('Unsupported image format')
+        raise_runtimerror('Unsupported image format')
 
     return 1
 
+def raise_runtimerror(error_msg):
+    close_clipboard()
+    raise RuntimeError(error_msg)
+
 if __name__ == '__main__':
     if open_clipboard():
-        empty_cliboard()
-        set_UNICODETEXT('pasta pasta pasta pasta pasta pasta')
+        # empty_cliboard()
+        print(get_available_formats())
+        # set_UNICODETEXT('pasta pasta pasta pasta pasta pasta')
         close_clipboard()
