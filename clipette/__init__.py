@@ -18,29 +18,46 @@ Usage (getting):
     if cliptette.open_clipboard():
         clipette.get_PNG("<filepath to save into>", "filename")
         clipette.close_clipboard()
+        
 """
 
 
 import ctypes
 from os.path import join as path_join
 from sys import getfilesystemencoding
-import clipette.utils as utils
+import utils
 
-def _raise_runtime_error(error_msg):
+
+class ClipetteWin32ClipboardError(Exception):
+    """
+    Raised when the clipboard is inaccessible or clipette is unable to
+    exchange given data with the clipboard.
+    """
+
+class ClipetteWin32MemoryError(Exception):
+    pass
+
+# the following functions to raise error safely after closing clipboard 
+def _raise_clipboard_error(error_msg):
     close_clipboard()
-    raise RuntimeError(error_msg)
+    raise ClipetteWin32ClipboardError(error_msg)
+
+def _raise_memory_error(error_msg):
+    close_clipboard()
+    raise ClipetteWin32MemoryError(error_msg)
+
 
 def _global_alloc(flags, size):
     h_mem = utils.kernel32.GlobalAlloc(flags, size)
     if(h_mem == None):
-        _raise_runtime_error("Unable to allocate memory.")
+        _raise_memory_error("Unable to allocate memory.")
     else:
         return h_mem
     
 def _global_lock(h_mem):
     lp_mem = utils.kernel32.GlobalLock(h_mem)
     if(lp_mem == None):
-        _raise_runtime_error("Unable to lock global memory object.")
+        _raise_memory_error("Unable to lock global memory object.")
     else:
         return lp_mem
 
@@ -50,14 +67,14 @@ def _global_unlock(h_mem):
 def _get_clipboard_data(format):
     h_mem = utils.user32.GetClipboardData(format)
     if(h_mem == None):
-        _raise_runtime_error("Unable to access clipboard data.")
+        _raise_clipboard_error("Unable to access clipboard data.")
     else:
         return h_mem
 
 def _set_clipboard_data(format, h_mem):
     h_data = utils.user32.SetClipboardData(format, h_mem)
     if(h_data == None):
-        _raise_runtime_error("Unable to set clipboard data.")
+        _raise_clipboard_error("Unable to set clipboard data.")
     else:
         return h_data
 
@@ -154,7 +171,7 @@ def get_DIB(filepath = '', filename = 'bitmap'):
 
     # user32.OpenClipboard(0)
     if not is_format_available(utils.CF_DIB):
-        _raise_runtime_error("clipboard image not available in 'CF_DIB' format")
+        _raise_clipboard_error("clipboard image not available in 'CF_DIB' format")
 
     h_mem = _get_clipboard_data(utils.CF_DIB)
     lp_mem = _global_lock(h_mem)
@@ -167,7 +184,7 @@ def get_DIB(filepath = '', filename = 'bitmap'):
 
     compression = bm_ih.biCompression
     if compression not in (utils.BI_BITFIELDS, utils.BI_RGB): 
-        _raise_runtime_error(f'unsupported compression type {format(compression)}')
+        _raise_clipboard_error(f'unsupported compression type {format(compression)}')
 
     bm_fh = utils.BITMAPFILEHEADER()
     ctypes.memset(ctypes.pointer(bm_fh), 0, utils.sizeof_BITMAPFILEHEADER)
@@ -196,7 +213,7 @@ def get_DIBV5(filepath = '', filename = 'bitmapV5'):
 
     # user32.OpenClipboard(0)
     if not is_format_available(utils.CF_DIBV5):
-        _raise_runtime_error("clipboard image not available in 'CF_DIBV5' format")
+        _raise_clipboard_error("clipboard image not available in 'CF_DIBV5' format")
 
     h_mem = _get_clipboard_data(utils.CF_DIBV5)
     lp_mem = _global_lock(h_mem)
@@ -222,7 +239,7 @@ def get_DIBV5(filepath = '', filename = 'bitmapV5'):
         data = data[:52] + bytes([0, 0, 0, 255]) + data[56:]
 
     else:
-        _raise_runtime_error(f'unsupported compression type {format(bm_ih.bV5Compression)}')
+        _raise_clipboard_error(f'unsupported compression type {format(bm_ih.bV5Compression)}')
 
     bm_fh = utils.BITMAPFILEHEADER()
     ctypes.memset(ctypes.pointer(bm_fh), 0, utils.sizeof_BITMAPFILEHEADER)
@@ -258,7 +275,7 @@ def get_PNG(filepath = '', filename = 'PNG'):
     elif utils.user32.IsClipboardFormatAvailable(image_png):
         png_format = image_png
     else:
-        _raise_runtime_error("clipboard image not available in 'PNG' or 'image/png' format")
+        _raise_clipboard_error("clipboard image not available in 'PNG' or 'image/png' format")
 
     h_mem = _get_clipboard_data(png_format)
     lp_mem = _global_lock(h_mem)
@@ -384,7 +401,7 @@ def get_image(filepath = '', filename = 'image'):
     elif utils.user32.IsClipboardFormatAvailable(utils.CF_DIB):
         return get_DIB(filepath, filename)
     else:
-        _raise_runtime_error('image on clipboard not available in any supported format')
+        _raise_clipboard_error('image on clipboard not available in any supported format')
 
 def set_image(src_img):
     """
@@ -403,10 +420,9 @@ def set_image(src_img):
     elif img_extn == 'png':
         set_PNG(src_img)
     else:
-        _raise_runtime_error('Unsupported image format')
+        _raise_clipboard_error('Unsupported image format')
 
     return True
-
 
 
 if __name__ == '__main__':
