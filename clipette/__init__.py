@@ -18,7 +18,7 @@ Usage (getting):
     if cliptette.open_clipboard():
         clipette.get_PNG("<filepath to save into>", "filename")
         clipette.close_clipboard()
-        
+
 """
 
 
@@ -38,40 +38,40 @@ class ClipetteWin32MemoryError(Exception):
     pass
 
 # the following functions to raise error safely after closing clipboard 
-def _raise_clipboard_error(error_msg):
+def _raise_clipboard_error(error_msg: str) -> None:
     close_clipboard()
     raise ClipetteWin32ClipboardError(error_msg)
 
-def _raise_memory_error(error_msg):
+def _raise_memory_error(error_msg: str) -> None:
     close_clipboard()
     raise ClipetteWin32MemoryError(error_msg)
 
 
-def _global_alloc(flags, size):
+def _global_alloc(flags: int, size: int) -> int:
     h_mem = utils.kernel32.GlobalAlloc(flags, size)
     if(h_mem == None):
         _raise_memory_error("Unable to allocate memory.")
     else:
         return h_mem
     
-def _global_lock(h_mem):
+def _global_lock(h_mem: int) -> int:
     lp_mem = utils.kernel32.GlobalLock(h_mem)
     if(lp_mem == None):
         _raise_memory_error("Unable to lock global memory object.")
     else:
         return lp_mem
 
-def _global_unlock(h_mem):
+def _global_unlock(h_mem: int) -> int:
     utils.kernel32.GlobalUnlock(h_mem)
 
-def _get_clipboard_data(format):
+def _get_clipboard_data(format: int) -> int:
     h_mem = utils.user32.GetClipboardData(format)
     if(h_mem == None):
         _raise_clipboard_error("Unable to access clipboard data.")
     else:
         return h_mem
 
-def _set_clipboard_data(format, h_mem):
+def _set_clipboard_data(format: int, h_mem: int) -> int:
     h_data = utils.user32.SetClipboardData(format, h_mem)
     if(h_data == None):
         _raise_clipboard_error("Unable to set clipboard data.")
@@ -79,35 +79,38 @@ def _set_clipboard_data(format, h_mem):
         return h_data
 
 
-def open_clipboard():
+def open_clipboard() -> int:
     """
     Opens clipboard. Must be called before any action in performed.
 
-    :return: (int) 0 if function fails, otherwise 1
+    :return: 0 if function fails, 1 otherwise.
+    :rtype: int
     """
     return utils.user32.OpenClipboard(None)
 
-def close_clipboard():
+def close_clipboard() -> int:
     """
     Closes clipboard. Must be called after all actions are performed.
 
-    :return: (int) 0 if function fails, otherwise 1
+    :return: 0 if function fails, 1 otherwise.
+    :rtype: int
     """
     return utils.user32.CloseClipboard()
 
-def empty_cliboard():
+def empty_cliboard() -> int:
     """
     Empties clipboard. Should be called before any setter actions.
 
-    :return: (int) 0 if function fails, otherwise 1
+    :return: 0 if function fails, 1 otherwise.
     """
     return utils.user32.EmptyClipboard()
     
-def get_UNICODETEXT():
+def get_UNICODETEXT() -> str:
     """
-    get text from clipboard as string 
+    Gets text from clipboard as a string.
 
-    :return: (str) text grabbed from clipboard 
+    :return: text grabbed from clipboard.
+    :rtype: str
     """
 
     # user32.OpenClipboard(0)
@@ -119,12 +122,14 @@ def get_UNICODETEXT():
 
     return text
 
-def set_UNICODETEXT(text):
+def set_UNICODETEXT(text: str) -> bool:
     """
-    set text to clipboard as CF_UNICODETEXT 
+    Sets text to clipboard in CF_UNICODETEXT format.
 
-    :param str text: text to set to clipboard
-    :return: True if function succeeds
+    :param text: text to set to clipboard.
+    :type text: str
+    :return: True if function succeeds.
+    :rtype: bool
     """
 
     data = text.encode('utf-16le')
@@ -141,12 +146,14 @@ def set_UNICODETEXT(text):
     # user32.CloseClipboard()
     return True
 
-def get_FILEPATHS():
+def get_FILEPATHS() -> list[str]:
     """
-    get list of files from clipboard. 
+    Gets list of filepaths from clipboard. 
 
-    :return: (list) filepaths
+    :return: list of filepaths.
+    :rtype: list[str]
     """
+
     filepaths = []
 
     #user32.OpenClipboard(0)
@@ -160,13 +167,16 @@ def get_FILEPATHS():
 
     return filepaths
 
-def get_DIB(filepath = '', filename = 'bitmap'):
+def get_DIB(filepath: str = '', filename: str = 'bitmap') -> str:
     """
-    get image from clipboard as a bitmap and saves to filepath.
+    Gets image from clipboard as a bitmap and saves to *filepath* as *filename.bmp*.
 
-    :param str filepath: filepath to save image into 
-    :param str filename: filename of the image
-    :return: full filepath of the saved image
+    :param filepath: filepath to save image into.
+    :type filepath: str
+    :param filename: filename of the image.
+    :type filename: str
+    :return: full filepath of the saved image.
+    :rtype: str
     """
 
     # user32.OpenClipboard(0)
@@ -202,13 +212,16 @@ def get_DIB(filepath = '', filename = 'bitmap'):
     # user32.CloseClipboard()
     return img_path
 
-def get_DIBV5(filepath = '', filename = 'bitmapV5'):
+def get_DIBV5(filepath: str = '', filename: str = 'bitmapV5') -> str:
     """
-    get image from clipboard as a bitmapV5 and saves to filepath
+    Gets image from clipboard as a bitmapV5 and saves to *filepath* as *filename.bmp*.
 
-    :param str filepath: filepath to save image into 
-    :param str filename: filename of the image
-    :return: full filepath of the saved image
+    :param str filepath: filepath to save image into.
+    :type filepath: str
+    :param filename: filename of the image.
+    :type filename: str
+    :return: full filepath of the saved image.
+    :rtype: str
     """
 
     # user32.OpenClipboard(0)
@@ -257,13 +270,16 @@ def get_DIBV5(filepath = '', filename = 'bitmapV5'):
     # user32.CloseClipboard()
     return img_path
 
-def get_PNG(filepath = '', filename = 'PNG'):
+def get_PNG(filepath: str = '', filename: str = 'PNG') -> str:
     """
-    get image in 'PNG' or 'image/png' format from clipboard and saves to filepath
+    Gets image in ``PNG`` or ``image/png`` format from clipboard and saves to *filepath* as *filename.png*.
 
-    :param str filepath: filepath to save image into
-    :param str filename: filename of the image
-    :return: full filepath of the saved image
+    :param str filepath: filepath to save image into.
+    :type filepath: str
+    :param filename: filename of the image.
+    :type filename: str
+    :return: full filepath of the saved image.
+    :rtype: str
     """
 
     # user32.OpenClipboard(0)
@@ -290,12 +306,14 @@ def get_PNG(filepath = '', filename = 'PNG'):
 
     return img_path
 
-def set_DIB(src_bmp):
+def set_DIB(src_bmp: str) -> bool:
     """
-    set source bitmap image to clipboard as a CF_DIB or CF_DIBV5 according to the image
+    Sets given bitmap image to clipboard in ``CF_DIB`` or ``CF_DIBV5`` format according to the image.
 
-    :param str src_bmp: full filepath of source image
-    :return: True if function succeeds
+    :param src_bmp: full filepath of source image.
+    :type src_bmp: str
+    :return: True if function succeeds.
+    :rtype: bool
     """
 
     with open(src_bmp, 'rb') as img:
@@ -321,13 +339,16 @@ def set_DIB(src_bmp):
     # user32.CloseClipboard()
     return 1  
 
-def set_PNG(src_png):
+def set_PNG(src_png: str) -> bool:
     """
-    set source png image to clipboard in 'PNG' format
+    Sets source PNG image to clipboard in ``PNG`` format.
 
-    :param str src_png: full filepath of source image
-    :return: True if function succeeds
+    :param src_png: full filepath of source image.
+    :type src_png: str
+    :return: True if function succeeds.
+    :rtype: bool
     """
+
     with open(src_png, 'rb') as img:
         data = img.read()
     size = len(data) 
@@ -344,12 +365,14 @@ def set_PNG(src_png):
     # user32.CloseClipboard()
     return True
 
-def is_format_available(format_id):
+def is_format_available(format_id: int) -> bool:
     """
-    checks whether specified format is currently available on the clipboard
+    Checks whether specified format is currently available on the clipboard.
 
-    :param int format_id: id of format to check for
-    :return: (bool) True if specified format is available, False otherwise.
+    :param format_id: id of format to check for.
+    :type format_id: int
+    :return: True if specified format is available, False otherwise.
+    :rtype: bool
     """
     
     # user32.OpenClipboard(0)
@@ -357,13 +380,16 @@ def is_format_available(format_id):
     # user32.CloseClipboard()
     return bool(is_format)
 
-def get_available_formats(buffer_size = 32):
+def get_available_formats(buffer_size: int = 32) -> dict[int, str]:
     """
-    gets a dict of all the currently available formats on the clipboard
+    Gets a dict of all the currently available formats on the clipboard.
 
-    :param int buffer_size: (optional) buffer size to store name of each format in
-    :return: a dict {format_id : format_name} of all available formats
+    :param buffer_size: (optional) buffer size to store name of each format in.
+    :type buffer_size: int
+    :return: a dict {format_id : format_name} of all available formats.
+    :rtype: dict[int, str]
     """
+
     available_formats = dict()
     # user32.OpenClipboard(0)
     fmt = 0
@@ -382,14 +408,18 @@ def get_available_formats(buffer_size = 32):
     # user32.CloseClipboard()
     return available_formats
 
-def get_image(filepath = '', filename = 'image'):
+def get_image(filepath: str = '', filename: str = 'image') -> str:
     """
-    gets image from clipboard in a format according to a priority list (PNG > DIBV5 > DIB)
+    Gets image from clipboard in a format according to a priority list (``PNG`` > ``DIBV5`` > ``DIB``).
 
-    :param str filepath: filepath to save image into
-    :param str filename: filename of the image
-    :return: full filepath of the saved image
+    :param filepath: filepath to save image into.
+    :type filepath: str
+    :param filename: filename of the image.
+    :type filename: str
+    :return: full filepath of the saved image.
+    :rtype: str
     """
+
     # user32.OpenClipboard(0)
     PNG = utils.user32.RegisterClipboardFormatW(ctypes.c_wchar_p('PNG'))
     image_png = utils.user32.RegisterClipboardFormatW(ctypes.c_wchar_p('image/png'))
@@ -403,13 +433,16 @@ def get_image(filepath = '', filename = 'image'):
     else:
         _raise_clipboard_error('image on clipboard not available in any supported format')
 
-def set_image(src_img):
+def set_image(src_img: str) -> bool:
     """
-    (NOT FULLY IMPLEMENTED) set source image to clipboard in multiple formats (PNG, DIB).
+    (NOT FULLY IMPLEMENTED) Sets source image to clipboard in multiple formats (``PNG``, ``DIB``).
 
-    :param str src_img: full filepath of source image
-    :return: True if function succeeds
+    :param src_img: full filepath of source image.
+    :type src_img: str
+    :return: True if function succeeds.
+    :rtype: bool
     """
+
     # this is more complicated... gotta interconvert images
     # looking into ways to get this done with ctypes as well - NO IM DONE
 
@@ -428,6 +461,6 @@ def set_image(src_img):
 if __name__ == '__main__':
     if open_clipboard():
         # empty_cliboard()
-        # print(get_available_formats())
-        set_UNICODETEXT('pasta pasta')
+        print(get_available_formats())
+        # set_UNICODETEXT('pasta pasta')
         close_clipboard()
