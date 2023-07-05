@@ -1,0 +1,4 @@
+- [Win32 Clipboard API](https://docs.microsoft.com/en-us/windows/win32/dataxchg/clipboard)
+- [Standard Windows Clipboard Formats](https://learn.microsoft.com/en-us/windows/win32/dataxchg/standard-clipboard-formats)
+- [BMP File Format](https://en.wikipedia.org/wiki/BMP_file_format)
+- [PNG File Format](https://en.wikipedia.org/wiki/PNG)

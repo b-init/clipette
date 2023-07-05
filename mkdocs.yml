@@ -1,0 +1,27 @@
+site_name: b-init/Clipette
+repo_url: https://github.com/b-init/clipette
+site_author: b-init
+
+
+theme:
+  name: terminal
+  palette: gruvbox_dark
+  features:
+    - navigation.side.indexes
+
+extra_css: [extra.css]
+
+nav:
+    - Home: 'index.md'
+    - Clipette:
+      # - Index: 'index.md'
+      - Usage: 'usage.md'
+      - 'functions.md'
+      - 'exceptions.md'
+      - References: 'references.md'
+
+markdown_extensions:
+  - toc:
+      permalink: "#"
+  - pymdownx.mark
+  - pymdownx.caret

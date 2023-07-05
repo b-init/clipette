@@ -15,7 +15,7 @@ Usage (setting):
 
 Usage (getting):
     import clipette
-    if cliptette.open_clipboard():
+    if clipette.open_clipboard():
         clipette.get_PNG("<filepath to save into>", "filename")
         clipette.close_clipboard()
 
@@ -97,7 +97,7 @@ def close_clipboard() -> int:
     """
     return utils.user32.CloseClipboard()
 
-def empty_cliboard() -> int:
+def empty_clipboard() -> int:
     """
     Empties clipboard. Should be called before any setter actions.
 
@@ -460,7 +460,7 @@ def set_image(src_img: str) -> bool:
 
 if __name__ == '__main__':
     if open_clipboard():
-        # empty_cliboard()
+        # empty_clipboard()
         print(get_available_formats())
         # set_UNICODETEXT('pasta pasta')
         close_clipboard()
