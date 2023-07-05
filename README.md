@@ -3,6 +3,9 @@ Python clipboard utility that works natively on python with its inbuilt modules 
 
 **-WORK IN PROGRESS-**
 
+## Documentation
+Refer to [the docs](https://b-init.github.io/clipette/) for function descriptions and more details.
+
 ## Usage
 Must call `open_clipboard()` before using any clipboard function which returns 0 on failure.
 Should call `empty_clipboard()` before setting any data to clipboard.
