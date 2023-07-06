@@ -1,10 +1,13 @@
 # Clipette
-Python clipboard utility that works natively on python with its inbuilt modules to exchange data with the windows clipboard. Designed specifically to be used for Blender (for [ImagePaste](https://github.com/Yeetus3141/ImagePaste)).
+Python clipboard utility that works natively on python to 
+exchange data with the windows clipboard through the win32 API.
+Is designed particularly to work properly with different image formats
+(for [ImagePaste](https://github.com/Yeetus3141/ImagePaste)) 
+but also works with other clipboard formats.
 
-**-WORK IN PROGRESS-**
 
 ## Documentation
-Refer to [the docs](https://b-init.github.io/clipette/) for function descriptions and more details.
+Please refer to [the docs](https://b-init.github.io/clipette/) for function descriptions and more details.
 
 ## Usage
 Must call `open_clipboard()` before using any clipboard function which returns 0 on failure.
