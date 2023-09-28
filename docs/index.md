@@ -1,8 +1,13 @@
 # Clipette
 
--------------------
-**THIS NEEDS TO GO**
--------------------
+```
+   |\---/|
+   | ,_, |
+    \_`_/-..----.
+ ___/ `   ' ,""+ \  sk
+(__...'   __\    |`.___.';
+  (_,...'(_,.`__)/'.....+
+```
 
 
 Python clipboard utility that works natively on python with its inbuilt 
