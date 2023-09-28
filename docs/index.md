@@ -1,5 +1,7 @@
 # Clipette
 
+<<THIS NEEDS TO BE REMOVED>>
+
 Python clipboard utility that works natively on python with its inbuilt 
 modules to exchange data with the windows clipboard.
 Supports only the Windows clipboard through the win32 API.
