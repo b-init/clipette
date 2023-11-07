@@ -26,6 +26,7 @@ import ctypes
 from os.path import join as path_join
 from sys import getfilesystemencoding
 import utils
+from contextlib import contextmanager
 
 
 class ClipetteWin32ClipboardError(Exception):
@@ -96,6 +97,19 @@ def close_clipboard() -> int:
     :rtype: int
     """
     return utils.user32.CloseClipboard()
+
+@contextmanager
+def clipboard():
+    """
+    Context manager to open and close clipboard automatically.
+
+    :return: if function fails, 1 otherwise.
+    :rtype: int
+    """
+    res = open_clipboard()
+    yield res
+    if res: close_clipboard()
+
 
 def empty_clipboard() -> int:
     """
