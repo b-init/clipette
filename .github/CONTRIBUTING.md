@@ -16,8 +16,8 @@ Please send a pull request to the `main` branch. Please include [documentation][
 
 - Separate code commits from reformatting commits.
 - Follow PEP 8.
-- When committing only documentation changes please include `[ci skip]` in the commit message to avoid running tests on AppVeyor.
-- Include [Documentation][link_docs_md] as needed or appropriate with your bug fixes, feature additions and tests.
+- Include [Documentation][link_docs_md] within the code in docstrings near definitions as needed or appropriate with your bug fixes, feature additions and tests. 
+- Documentation docstrings within code must follow [Sphinx docstring style](https://sphinx-rtd-tutorial.readthedocs.io/en/latest/docstrings.html).
 
 ## Reporting Issues
 
