@@ -40,7 +40,6 @@ format_dict = {
     17: 'CF_DIBV5',
 }
 
-
 class BITMAPFILEHEADER(ctypes.Structure):
     _pack_ = 1  # structure field byte alignment
     _fields_ = [
@@ -49,11 +48,8 @@ class BITMAPFILEHEADER(ctypes.Structure):
         ('bfReserved1', WORD),  # must be zero
         ('bfReserved2', WORD),  # must be zero
         ('bfOffBits', DWORD),  # byte offset to the pixel array
-    ]
-
-
+    ]   
 sizeof_BITMAPFILEHEADER = ctypes.sizeof(BITMAPFILEHEADER)
-
 
 class BITMAPINFOHEADER(ctypes.Structure):
     _pack_ = 1  # structure field byte alignment
@@ -70,13 +66,10 @@ class BITMAPINFOHEADER(ctypes.Structure):
         ('biClrUsed', DWORD),
         ('biClrImportant', DWORD)
     ]
-
-
 sizeof_BITMAPINFOHEADER = ctypes.sizeof(BITMAPINFOHEADER)
 
-
 class BITMAPV4HEADER(ctypes.Structure):
-    _pack_ = 1  # structure field byte alignment
+    _pack_ = 1 # structure field byte alignment
     _fields_ = [
         ('bV4Size', DWORD),
         ('bV4Width', LONG),
@@ -107,13 +100,10 @@ class BITMAPV4HEADER(ctypes.Structure):
         ('bV4GammaGreen', DWORD),
         ('bV4GammaBlue', DWORD)
     ]
-
-
 sizeof_BITMAPV4HEADER = ctypes.sizeof(BITMAPV4HEADER)
 
-
 class BITMAPV5HEADER(ctypes.Structure):
-    _pack_ = 1  # structure field byte alignment
+    _pack_ = 1 # structure field byte alignment
     _fields_ = [
         ('bV5Size', DWORD),
         ('bV5Width', LONG),
@@ -148,8 +138,6 @@ class BITMAPV5HEADER(ctypes.Structure):
         ('bV5ProfileSize', DWORD),
         ('bV5Reserved', DWORD)
     ]
-
-
 sizeof_BITMAPV5HEADER = ctypes.sizeof(BITMAPV5HEADER)
 
 
@@ -186,7 +174,7 @@ kernel32.GlobalAlloc.argtypes = UINT, ctypes.c_size_t
 kernel32.GlobalAlloc.restype = HGLOBAL
 kernel32.GlobalSize.argtypes = HGLOBAL,
 kernel32.GlobalSize.restype = UINT
-kernel32.GlobalLock.argtypes = HGLOBAL,
+kernel32.GlobalLock.argtypes = HGLOBAL, 
 kernel32.GlobalLock.restype = LPVOID
 kernel32.GlobalUnlock.argtypes = HGLOBAL,
 kernel32.GlobalUnlock.restype = BOOL
