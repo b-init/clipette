@@ -19,6 +19,7 @@ nav:
       - 'functions.md'
       - 'exceptions.md'
       - References: 'references.md'
+      - Want to Contribute : 'Contributing-guide.md'
 
 markdown_extensions:
   - toc:
