@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <meta name="generator" content="mkdocs-1.5.3, mkdocs-terminal-4.4.0">
+     
+    
+    <meta name="author" content="b-init"> 
+    <link rel="icon" type="image/png" sizes="192x192" href="../img/android-chrome-192x192.png" />
+<link rel="icon" type="image/png" sizes="512x512" href="../img/android-chrome-512x512.png" />
+<link rel="apple-touch-icon" sizes="180x180" href="../img/apple-touch-icon.png" />
+<link rel="shortcut icon" type="image/png" sizes="48x48" href="../img/favicon.ico" />
+<link rel="icon" type="image/png" sizes="16x16" href="../img/favicon-16x16.png" />
+<link rel="icon" type="image/png" sizes="32x32" href="../img/favicon-32x32.png" />
+
+
+    
+ 
+<title>Functions - b-init/Clipette</title>
+
+
+<link href="../css/fontawesome/css/fontawesome.min.css" rel="stylesheet">
+<link href="../css/fontawesome/css/solid.min.css" rel="stylesheet">
+<link href="../css/normalize.css" rel="stylesheet">
+<link href="../css/terminal.css" rel="stylesheet">
+<link href="../css/theme.css" rel="stylesheet">
+<link href="../css/theme.tile_grid.css" rel="stylesheet">
+<link href="../css/theme.footer.css" rel="stylesheet">
+<!-- gruvbox_dark color palette -->
+<link href="../css/palettes/gruvbox_dark.css" rel="stylesheet">
+
+<!-- page layout -->
+<style>
+/* initially set page layout to a one column grid */
+.terminal-mkdocs-main-grid {
+    display: grid;
+    grid-column-gap: 1.4em;
+    grid-template-columns: auto;
+    grid-template-rows: auto;
+}
+
+/*  
+*   when side navigation is not hidden, use a two column grid.  
+*   if the screen is too narrow, fall back to the initial one column grid layout.
+*   in this case the main content will be placed under the navigation panel. 
+*/
+@media only screen and (min-width: 70em) {
+    .terminal-mkdocs-main-grid {
+        grid-template-columns: 4fr 9fr;
+    }
+}</style>
+
+
+
+    
+    <link href="../extra.css" rel="stylesheet">  
+    
+    
+
+    
+    <!-- search css support -->
+<link href="../css/search/bootstrap-modal.css" rel="stylesheet">
+<!-- search scripts -->
+<script>
+    var base_url = "..",
+    shortcuts = "{}";
+</script>
+<script src="../js/jquery/jquery-1.10.1.min.js" defer></script>
+<script src="../js/bootstrap/bootstrap.min.js" defer></script>
+<script src="../js/mkdocs/base.js" defer></script>
+    
+    
+    
+    
+    <script src="../search/main.js"></script>
+    
+
+    
+</head>
+
+<body class="terminal"><div class="container">
+    <div class="terminal-nav">
+        <header class="terminal-logo">
+            <div id="mkdocs-terminal-site-name" class="logo terminal-prompt"><a href="/" class="no-style">b-init/Clipette</a></div>
+        </header>
+        
+        <nav class="terminal-menu">
+            
+            <ul vocab="https://schema.org/" typeof="BreadcrumbList">
+                
+                
+                <li property="itemListElement" typeof="ListItem">
+                    <a href=".." class="menu-item " property="item" typeof="WebPage">
+                        <span property="name">Home</span>
+                    </a>
+                    <meta property="position" content="0">
+                </li>
+                
+                
+                
+                    
+                    
+
+
+<li property="itemListElement" typeof="ListItem">
+    <a href="#" class="menu-item" data-toggle="modal" data-target="#mkdocs_search_modal" property="item" typeof="SearchAction">
+        <i aria-hidden="true" class="fa fa-search"></i> <span property="name">Search</span>
+    </a>
+    <meta property="position" content="1">
+</li>
+                    
+            </ul>
+            
+        </nav>
+    </div>
+</div>
+        
+    <div class="container">
+        <div class="terminal-mkdocs-main-grid"><aside id="terminal-mkdocs-side-panel"><nav>
+  
+    <ul class="terminal-mkdocs-side-nav-items">
+        
+          
+
+
+
+<li class="terminal-mkdocs-side-nav-li">
+    
+    
+    
+        
+        
+            <a class="
+
+    terminal-mkdocs-side-nav-item" href="..">Home</a>
+        
+    
+    
+    
+  </li>
+        
+          
+
+
+
+<li class="terminal-mkdocs-side-nav-li">
+    
+    
+        
+        
+            
+                
+        
+
+        
+            
+    
+        
+        <span class="
+        
+            
+        
+    
+
+    terminal-mkdocs-side-nav-item--active terminal-mkdocs-side-nav-section-no-index">Clipette</span>
+    
+    
+        
+      
+        
+            <ul class="terminal-mkdocs-side-nav-li-ul">
+        
+            
+            
+                
+                
+            
+
+             
+                <li class="terminal-mkdocs-side-nav-li-ul-li">
+    
+        
+        
+            <a class="
+
+    terminal-mkdocs-side-nav-item" href="../usage/">Usage</a>
+        
+    
+    </li>
+            
+        
+            
+            
+                
+                
+            
+
+             
+                <li class="terminal-mkdocs-side-nav-li-ul-li">
+    
+        
+        <span class="
+
+    terminal-mkdocs-side-nav-item--active">Functions</span>
+    
+    </li>
+            
+        
+            
+            
+                
+                
+            
+
+             
+                <li class="terminal-mkdocs-side-nav-li-ul-li">
+    
+        
+        
+            <a class="
+
+    terminal-mkdocs-side-nav-item" href="../exceptions/">Exceptions</a>
+        
+    
+    </li>
+            
+        
+            
+            
+                
+                
+            
+
+             
+                <li class="terminal-mkdocs-side-nav-li-ul-li">
+    
+        
+        
+            <a class="
+
+    terminal-mkdocs-side-nav-item" href="../references/">References</a>
+        
+    
+    </li>
+            
+        
+            
+            
+                
+                
+            
+
+             
+                <li class="terminal-mkdocs-side-nav-li-ul-li">
+    
+        
+        
+            <a class="
+
+    terminal-mkdocs-side-nav-item" href="../Contributing-guide/">Want to Contribute</a>
+        
+    
+    </li>
+            
+            
+    </ul>
+        
+    
+  </li>
+        
+    </ul>
+  
+</nav><hr>
+<nav>
+    <ul>
+        <li><a href="#open_clipboard">open_clipboard</a></li>
+        <li><a href="#close_clipboard">close_clipboard</a></li>
+        <li><a href="#empty_clipboard">empty_clipboard</a></li>
+        <li><a href="#get_unicodetext">get_UNICODETEXT</a></li>
+        <li><a href="#set_unicodetext">set_UNICODETEXT</a></li>
+        <li><a href="#get_filepaths">get_FILEPATHS</a></li>
+        <li><a href="#get_dib">get_DIB</a></li>
+        <li><a href="#get_dibv5">get_DIBV5</a></li>
+        <li><a href="#get_png">get_PNG</a></li>
+        <li><a href="#set_dib">set_DIB</a></li>
+        <li><a href="#set_png">set_PNG</a></li>
+        <li><a href="#is_format_available">is_format_available</a></li>
+        <li><a href="#get_available_formats">get_available_formats</a></li>
+        <li><a href="#get_image">get_image</a></li>
+        <li><a href="#set_image">set_image</a></li>
+        
+    </ul>
+</nav>
+</aside>
+            <main id="terminal-mkdocs-main-content">
+<section id="mkdocs-terminal-content">
+    <h2 id="open_clipboard">open_clipboard<a class="headerlink" href="#open_clipboard" title="Permanent link">#</a></h2>
+<pre><code class="language-python">def open_clipboard() -&gt; int
+</code></pre>
+<p>Opens clipboard. Must be called before any action in performed.</p>
+<p><strong><ins>Returns</ins></strong>:</p>
+<p><code>int</code>: 0 if function fails, 1 otherwise.</p>
+<p><a id="clipette.close_clipboard"></a></p>
+<p>&nbsp;</p>
+<h2 id="close_clipboard">close_clipboard<a class="headerlink" href="#close_clipboard" title="Permanent link">#</a></h2>
+<pre><code class="language-python">def close_clipboard() -&gt; int
+</code></pre>
+<p>Closes clipboard. Must be called after all actions are performed.</p>
+<p><strong><ins>Returns</ins></strong>:</p>
+<p><code>int</code>: 0 if function fails, 1 otherwise.</p>
+<p><a id="clipette.empty_clipboard"></a></p>
+<p>&nbsp;</p>
+<h2 id="empty_clipboard">empty_clipboard<a class="headerlink" href="#empty_clipboard" title="Permanent link">#</a></h2>
+<pre><code class="language-python">def empty_clipboard() -&gt; int
+</code></pre>
+<p>Empties clipboard. Should be called before any setter actions.</p>
+<p><strong><ins>Returns</ins></strong>:</p>
+<p>0 if function fails, 1 otherwise.</p>
+<p><a id="clipette.get_UNICODETEXT"></a></p>
+<p>&nbsp;</p>
+<h2 id="get_unicodetext">get_UNICODETEXT<a class="headerlink" href="#get_unicodetext" title="Permanent link">#</a></h2>
+<pre><code class="language-python">def get_UNICODETEXT() -&gt; str
+</code></pre>
+<p>Gets text from clipboard as a string.</p>
+<p><strong><ins>Returns</ins></strong>:</p>
+<p><code>str</code>: text grabbed from clipboard.</p>
+<p><a id="clipette.set_UNICODETEXT"></a></p>
+<p>&nbsp;</p>
+<h2 id="set_unicodetext">set_UNICODETEXT<a class="headerlink" href="#set_unicodetext" title="Permanent link">#</a></h2>
+<pre><code class="language-python">def set_UNICODETEXT(text: str) -&gt; bool
+</code></pre>
+<p>Sets text to clipboard in CF_UNICODETEXT format.</p>
+<p><strong><ins>Arguments</ins></strong>:</p>
+<ul>
+<li><code>text</code> (<code>str</code>): text to set to clipboard.</li>
+</ul>
+<p><strong><ins>Returns</ins></strong>:</p>
+<p><code>bool</code>: True if function succeeds.</p>
+<p><a id="clipette.get_FILEPATHS"></a></p>
+<p>&nbsp;</p>
+<h2 id="get_filepaths">get_FILEPATHS<a class="headerlink" href="#get_filepaths" title="Permanent link">#</a></h2>
+<pre><code class="language-python">def get_FILEPATHS() -&gt; list[str]
+</code></pre>
+<p>Gets list of filepaths from clipboard. </p>
+<p><strong><ins>Returns</ins></strong>:</p>
+<p><code>list[str]</code>: list of filepaths.</p>
+<p><a id="clipette.get_DIB"></a></p>
+<p>&nbsp;</p>
+<h2 id="get_dib">get_DIB<a class="headerlink" href="#get_dib" title="Permanent link">#</a></h2>
+<pre><code class="language-python">def get_DIB(filepath: str = '', filename: str = 'bitmap') -&gt; str
+</code></pre>
+<p>Gets image from clipboard as a bitmap and saves to <em>filepath</em> as <em>filename.bmp</em>.</p>
+<p><strong><ins>Arguments</ins></strong>:</p>
+<ul>
+<li><code>filepath</code> (<code>str</code>): filepath to save image into.</li>
+<li><code>filename</code> (<code>str</code>): filename of the image.</li>
+</ul>
+<p><strong><ins>Returns</ins></strong>:</p>
+<p><code>str</code>: full filepath of the saved image.</p>
+<p><a id="clipette.get_DIBV5"></a></p>
+<p>&nbsp;</p>
+<h2 id="get_dibv5">get_DIBV5<a class="headerlink" href="#get_dibv5" title="Permanent link">#</a></h2>
+<pre><code class="language-python">def get_DIBV5(filepath: str = '', filename: str = 'bitmapV5') -&gt; str
+</code></pre>
+<p>Gets image from clipboard as a bitmapV5 and saves to <em>filepath</em> as <em>filename.bmp</em>.</p>
+<p><strong><ins>Arguments</ins></strong>:</p>
+<ul>
+<li><code>filepath</code> (<code>str</code>): filepath to save image into.</li>
+<li><code>filename</code> (<code>str</code>): filename of the image.</li>
+</ul>
+<p><strong><ins>Returns</ins></strong>:</p>
+<p><code>str</code>: full filepath of the saved image.</p>
+<p><a id="clipette.get_PNG"></a></p>
+<p>&nbsp;</p>
+<h2 id="get_png">get_PNG<a class="headerlink" href="#get_png" title="Permanent link">#</a></h2>
+<pre><code class="language-python">def get_PNG(filepath: str = '', filename: str = 'PNG') -&gt; str
+</code></pre>
+<p>Gets image in <code>PNG</code> or <code>image/png</code> format from clipboard and saves to <em>filepath</em> as <em>filename.png</em>.</p>
+<p><strong><ins>Arguments</ins></strong>:</p>
+<ul>
+<li><code>filepath</code> (<code>str</code>): filepath to save image into.</li>
+<li><code>filename</code> (<code>str</code>): filename of the image.</li>
+</ul>
+<p><strong><ins>Returns</ins></strong>:</p>
+<p><code>str</code>: full filepath of the saved image.</p>
+<p><a id="clipette.set_DIB"></a></p>
+<p>&nbsp;</p>
+<h2 id="set_dib">set_DIB<a class="headerlink" href="#set_dib" title="Permanent link">#</a></h2>
+<pre><code class="language-python">def set_DIB(src_bmp: str) -&gt; bool
+</code></pre>
+<p>Sets given bitmap image to clipboard in <code>CF_DIB</code> or <code>CF_DIBV5</code> format according to the image.</p>
+<p><strong><ins>Arguments</ins></strong>:</p>
+<ul>
+<li><code>src_bmp</code> (<code>str</code>): full filepath of source image.</li>
+</ul>
+<p><strong><ins>Returns</ins></strong>:</p>
+<p><code>bool</code>: True if function succeeds.</p>
+<p><a id="clipette.set_PNG"></a></p>
+<p>&nbsp;</p>
+<h2 id="set_png">set_PNG<a class="headerlink" href="#set_png" title="Permanent link">#</a></h2>
+<pre><code class="language-python">def set_PNG(src_png: str) -&gt; bool
+</code></pre>
+<p>Sets source PNG image to clipboard in <code>PNG</code> format.</p>
+<p><strong><ins>Arguments</ins></strong>:</p>
+<ul>
+<li><code>src_png</code> (<code>str</code>): full filepath of source image.</li>
+</ul>
+<p><strong><ins>Returns</ins></strong>:</p>
+<p><code>bool</code>: True if function succeeds.</p>
+<p><a id="clipette.is_format_available"></a></p>
+<p>&nbsp;</p>
+<h2 id="is_format_available">is_format_available<a class="headerlink" href="#is_format_available" title="Permanent link">#</a></h2>
+<pre><code class="language-python">def is_format_available(format_id: int) -&gt; bool
+</code></pre>
+<p>Checks whether specified format is currently available on the clipboard.</p>
+<p><strong><ins>Arguments</ins></strong>:</p>
+<ul>
+<li><code>format_id</code> (<code>int</code>): id of format to check for.</li>
+</ul>
+<p><strong><ins>Returns</ins></strong>:</p>
+<p><code>bool</code>: True if specified format is available, False otherwise.</p>
+<p><a id="clipette.get_available_formats"></a></p>
+<p>&nbsp;</p>
+<h2 id="get_available_formats">get_available_formats<a class="headerlink" href="#get_available_formats" title="Permanent link">#</a></h2>
+<pre><code class="language-python">def get_available_formats(buffer_size: int = 32) -&gt; dict[int, str]
+</code></pre>
+<p>Gets a dict of all the currently available formats on the clipboard.</p>
+<p><strong><ins>Arguments</ins></strong>:</p>
+<ul>
+<li><code>buffer_size</code> (<code>int</code>): (optional) buffer size to store name of each format in.</li>
+</ul>
+<p><strong><ins>Returns</ins></strong>:</p>
+<p><code>dict[int, str]</code>: a dict {format_id : format_name} of all available formats.</p>
+<p><a id="clipette.get_image"></a></p>
+<p>&nbsp;</p>
+<h2 id="get_image">get_image<a class="headerlink" href="#get_image" title="Permanent link">#</a></h2>
+<pre><code class="language-python">def get_image(filepath: str = '', filename: str = 'image') -&gt; str
+</code></pre>
+<p>Gets image from clipboard in a format according to a priority list (<code>PNG</code> &gt; <code>DIBV5</code> &gt; <code>DIB</code>).</p>
+<p><strong><ins>Arguments</ins></strong>:</p>
+<ul>
+<li><code>filepath</code> (<code>str</code>): filepath to save image into.</li>
+<li><code>filename</code> (<code>str</code>): filename of the image.</li>
+</ul>
+<p><strong><ins>Returns</ins></strong>:</p>
+<p><code>str</code>: full filepath of the saved image.</p>
+<p><a id="clipette.set_image"></a></p>
+<p>&nbsp;</p>
+<h2 id="set_image">set_image<a class="headerlink" href="#set_image" title="Permanent link">#</a></h2>
+<pre><code class="language-python">def set_image(src_img: str) -&gt; bool
+</code></pre>
+<p>(NOT FULLY IMPLEMENTED) Sets source image to clipboard in multiple formats (<code>PNG</code>, <code>DIB</code>).</p>
+<p><strong><ins>Arguments</ins></strong>:</p>
+<ul>
+<li><code>src_img</code> (<code>str</code>): full filepath of source image.</li>
+</ul>
+<p><strong><ins>Returns</ins></strong>:</p>
+<p><code>bool</code>: True if function succeeds.</p>
+</section>
+
+            </main>
+        </div>
+        <hr><footer>
+    <div class="terminal-mkdocs-footer-grid">
+        <div id="terminal-mkdocs-footer-copyright-info">
+             Site built with <a href="http://www.mkdocs.org">MkDocs</a> and <a href="https://github.com/ntno/mkdocs-terminal">Terminal for MkDocs</a>.
+        </div>
+    </div>
+</footer>
+    </div>
+
+    
+    <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="alertdialog" aria-modal="true" aria-labelledby="searchModalLabel">
+    <div class="modal-dialog modal-lg" role="search">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="searchModalLabel">Search</h5>
+                <button type="button" class="close btn btn-default btn-ghost" data-dismiss="modal"><span aria-hidden="true">x</span><span class="sr-only">Close</span></button>
+            </div>
+            <div class="modal-body">
+                <p id="searchInputLabel">Type to start searching</p>
+                <form>
+                    <div class="form-group">
+                        <input type="search" class="form-control" aria-labelledby="searchInputLabel" placeholder="" id="mkdocs-search-query" title="Please enter search terms here">
+                    </div>
+                </form>
+                <div id="mkdocs-search-results" data-no-results-text="No document matches found"></div>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
+    
+    
+</body>
+
+</html>
